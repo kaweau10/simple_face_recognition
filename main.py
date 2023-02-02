@@ -1,6 +1,7 @@
 import os
 import cv2
 import face_recognition
+import numpy as np
 
 # Create a list to store known faces
 known_faces = []
@@ -47,14 +48,16 @@ face_encodings = face_recognition.face_encodings(input_image)
 # If a face is detected in the input image
 if len(face_encodings) > 0:
     # Compare the input face encoding with the known faces
-    #matches = face_recognition.compare_faces(known_faces, face_encodings[0])
-    matches = face_recognition.face_distance(known_faces, face_encodings[0]) > 0.6
+    distances = face_recognition.face_distance(known_faces, face_encodings[0])
 
-    # If a match is found
-    if True in matches:
-        first_match_index = matches.index(True)
-        print("Match found:", known_face_names[first_match_index])
+    #Find the index of the best match in distances
+    best_match_index = np.argmin(distances)
+
+    #If match is below tolerance threshold, print name of person
+    if distances[best_match_index] <= 0.6:
+        print("Match found:", known_face_names[best_match_index])
     else:
         print("No match found")
+
 else:
     print("No face detected in the input image")
